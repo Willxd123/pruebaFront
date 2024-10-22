@@ -20,7 +20,13 @@ export class WelcomeComponent {
     private apiService: ApiService,
     private router: Router,
     private serverService: ServerService
-  ) {}
+  ) {
+    const token = this.apiService.getToken();
+    console.log('Token en WelcomeComponent:', token);
+    if (!token) {
+      this.router.navigate(['']); // Si no hay token, redirigir al login
+    }
+  }
 
   logout() {
     this.apiService.logout(); // Cerrar sesión
@@ -32,7 +38,6 @@ export class WelcomeComponent {
 
     this.apiService.createRoom(createRoomDto).subscribe({
       next: (room) => {
-
         this.router.navigate([`/room/${room.code}`]); // Redirige a la sala
       },
       error: (err) => {
@@ -51,13 +56,13 @@ export class WelcomeComponent {
     this.apiService.joinRoom(this.roomCode).subscribe({
       next: (response) => {
         console.log('Respuesta del servidor:', response);
-        this.router.navigate([`/room/${this.roomCode}`]);  // Redirige a la sala
+        this.router.navigate([`/room/${this.roomCode}`]); // Redirige a la sala
       },
       error: (err) => {
         console.error('Error al unirse a la sala:', err);
-        this.joinErrorMessage = 'No se pudo unir a la sala. Verifica el código e inténtalo de nuevo.';
-      }
+        this.joinErrorMessage =
+          'No se pudo unir a la sala. Verifica el código e inténtalo de nuevo.';
+      },
     });
   }
-
 }

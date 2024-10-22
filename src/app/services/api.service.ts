@@ -61,8 +61,25 @@ export class ApiService {
       localStorage.setItem(this.tokenKey, token);
     }
   } */
-
   isAuthenticated(): boolean {
+    const token = this.getToken();
+    console.log('Token en isAuthenticated:', token);
+    if (!token) {
+      return false;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      console.log('Payload del token:', payload);
+      const exp = payload.exp * 1000;
+      return Date.now() < exp;
+    } catch (e) {
+      console.error('Error al decodificar el token:', e);
+      return false;
+    }
+  }
+
+  /* isAuthenticated(): boolean {
     const token = this.getToken();
     if (!token) {
       return false;
@@ -71,7 +88,7 @@ export class ApiService {
     const payload = JSON.parse(atob(token.split('.')[1]));
     const exp = payload.exp * 1000;
     return Date.now() < exp;
-  }
+  } */
 
   // Crear una sala con el encabezado de autenticación
   createRoom(createRoomDto: any): Observable<any> {
@@ -122,8 +139,29 @@ export class ApiService {
     localStorage.removeItem(this.tokenKey); // Elimina el token del almacenamiento local
     this.router.navigate(['']); // Redirige al usuario a la página de login
   }
-  // Método para manejar el login con Google
-  handleGoogleLogin(token: string) {
-    localStorage.setItem(this.tokenKey, token);
+  // Login con Google OAuth
+  googleLogin(): void {
+    // Redirige al usuario a la URL de autenticación de Google en el backend
+    window.location.href = `${this.apiUrl}/auth/google`;
+  }
+
+  // Manejo del token después del redireccionamiento desde Google
+  handleGoogleLogin(token: string): void {
+    console.log('Token recibido de Google:', token);
+    this.setToken(token); // Guarda el token
+    this.router.navigate(['/client']); // Redirige a la vista protegida
+  }
+
+  // Método para procesar el token después del callback de Google
+  processGoogleCallback(): void {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (token) {
+      console.log('Token capturado:', token);
+      this.handleGoogleLogin(token);
+    } else {
+      console.error('No se encontró token en la URL');
+    }
   }
 }
