@@ -15,22 +15,19 @@ export class LoginComponent implements OnInit{
   errorMessage: string = '';
 
   constructor(private apiService: ApiService, private router: Router) {}
-  ngOnInit(): void {
-    // Capturar el token desde la URL si está presente
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
 
-    if (token) {
-      this.apiService.handleGoogleLogin(token);  // Almacenar el token en localStorage
-      this.router.navigate(['/client']);  // Redirigir a la vista client
-    }
+  ngOnInit(): void {
+    this.apiService.processGoogleCallback();
   }
+
+
+
 
   // Método para iniciar sesión con Google
   loginWithGoogle(): void {
-    window.location.href = 'http://localhost:3000/api/auth/google'; // Redirigir al endpoint de Google OAuth
-
+    this.apiService.googleLogin();
   }
+
 
   onLogin(): void {
     // Verifica que el email y el password no estén vacíos

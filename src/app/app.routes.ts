@@ -33,7 +33,7 @@ export const routes: Routes = [
   {
     path: 'room/:code',
     component: RoomsComponent,
-    canActivate: [AuthGuard],
+
   }, // Ruta dinámica para la sala
 /*   {
     path: 'board',
